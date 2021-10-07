@@ -2,33 +2,51 @@ import java.util.Stack;
 import java.util.ArrayList;
 
 public class BinaryTranslator {
+    // There are two possible ways to convert a number in this program:
+    // Either binary 2 decimal, or decimal 2 binary
+    // An enum is a nice way to store constants with a limited set of states
+    // For example, instead of checking an int for 1 == alive and 0 == dead,
+    // You can instead create an enum Condition {} with two states, LIVE and DEAD
+    // 
+    // Enums also work really well and perform well in switch case statements. 
+    // Use enums like Player.X and Player.O instead of 'x' and 'o' chars in tetris lol
     public enum Conversion {
-        BINARYFIRST, DECIMALFIRST
+        BINARY2DECIMAL, DECIMAL2BINARY
     }
 
+    // There are two possible ways to recieve user input in this program
     public enum InputType {
         FILE, INPUT
     }
 
-    public Conversion getType() {
+    // Matches user input to either a Binary to Decimal or Decimal to Binary enum
+    public Conversion getConversion() {
+        // Create a dictionary of lexemes (phrases)
         ArrayList<Lexeme<Conversion>> conversionType = new ArrayList<>();
-        conversionType.add(new Lexeme<>("btd", "convert binary to decimal", Conversion.BINARYFIRST));
-        conversionType.add(new Lexeme<>("dtb", "convert decimal to binary", Conversion.DECIMALFIRST));
+        // In this case, "btd" becomes the BINARY2DECIMAL enum
+        conversionType.add(new Lexeme<>("btd", "convert binary to decimal", Conversion.BINARY2DECIMAL));
+        // In this case, "dtb" becomes the DECIMAL2BINARY enum
+        conversionType.add(new Lexeme<>("dtb", "convert decimal to binary", Conversion.DECIMAL2BINARY));
+        // Why are we using enums instead of just checking strings for equality?
+        // Because, if we do `if "btd" "dtb"` we also have to handle the `else {...}` 
 
         return (new Input<Conversion>(conversionType)).matchUserInput().enumeration;
     }
 
+    // Matches user input to either a file or input, and reads from stdin or the file to get the string
     public String getInput() {
         ArrayList<Lexeme<InputType>> inputTypes = new ArrayList<>();
         inputTypes.add(new Lexeme<>("file", "enter a file", InputType.FILE));
         inputTypes.add(new Lexeme<>("input", "use the console", InputType.INPUT));
 
         String input = "";
+        // Gets input string, whether it be from the REPL (read evaluate print loop) or from a file
         switch ((new Input<InputType>(inputTypes)).matchUserInput().enumeration) {
             case FILE:
                 input = InputWrapper.readFile();
                 break;
             case INPUT:
+                System.out.println("Please enter a number:");
                 input = InputWrapper.nextLine();
                 break;
         }
@@ -95,14 +113,14 @@ public class BinaryTranslator {
         // Get input string using either file or console
         String input = getInput();
         // Get conversion type (either binary to decimal or decimal to binary)
-        Conversion conversionType = getType();
+        Conversion conversionType = getConversion();
         // Get the converted value, in string
         String out = "";
         switch (conversionType) {
-            case BINARYFIRST:
+            case BINARY2DECIMAL:
                 out = Integer.toString(BinaryToDecimal(input));
                 break;
-            case DECIMALFIRST:
+            case DECIMAL2BINARY:
                 out = DecimalToBinary(input);
                 break;
         }
